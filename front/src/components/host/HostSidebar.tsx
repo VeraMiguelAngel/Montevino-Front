@@ -3,7 +3,8 @@ import Link from "next/link";
 
 const hostLinks = [
   { href: "/host", label: "Dashboard" },
-  { href: "/host/reservas", label: "Reservas del día" },
+  { href: "/host/reservas", label: "Reservas" },
+  { href: "/host/ordenes", label: "Órdenes en curso" },
 ];
 
 const HostSidebar = ({

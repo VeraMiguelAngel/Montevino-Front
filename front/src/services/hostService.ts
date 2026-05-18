@@ -67,4 +67,46 @@ export const deliverPedido = async (pedidoId: string) => {
   });
   if (!res.ok) throw new Error("Error al marcar pedido como entregado");
   return res.json();
-};  
+};
+
+export const addPedido = async (hostOrderId: string, platoId: string, quantity: number) => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/orders/${hostOrderId}/pedidos`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ platoId, quantity }),
+  });
+  if (!res.ok) throw new Error("Error al agregar pedido");
+  return res.json();
+};
+
+export const closeOrder = async (hostOrderId: string) => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/orders/${hostOrderId}/close`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al cerrar la orden");
+  return res.json();
+};
+
+export const getActiveOrders = async () => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/orders`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al traer las órdenes activas");
+  return res.json();
+};
+
+
+

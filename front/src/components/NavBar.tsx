@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FiMenu, FiX } from "react-icons/fi";
 import { useAuth } from "@/context/AuthContext"; // importa tu hook
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type NavbarProps = {
   sidebarOpen?: boolean;
@@ -83,18 +83,18 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
           {!userData ? (
             <Link
               href="/login"
-              className="relative overflow-hidden bg-gradient-to-r hidden md:inline-block ml-4 bg-[#FED0BB] text-[#350A06] px-4 py-2 rounded-lg font-semibold hover:bg-[#350A06] hover:text-[#FED0BB] transition duration-300 group"
+              className="relative overflow-hidden bg-linear-to-r hidden md:inline-block ml-4 bg-[#FED0BB] text-[#350A06] px-4 py-2 rounded-lg font-semibold hover:bg-[#350A06] hover:text-[#FED0BB] transition duration-300 group"
             >
               Iniciar sesión
-              <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+              <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
             </Link>
           ) : (
             <button
               onClick={handleLogout}
-              className="relative overflow-hidden px-4 py-2 bg-gradient-to-r from-[#4a1414f7] to-[#56070C] text-FED0BB font-semibold rounded-md transition duration-300 group"
+              className="relative overflow-hidden px-4 py-2 bg-linear-to-r from-[#4a1414f7] to-[#56070C] text-FED0BB font-semibold rounded-md transition duration-300 group"
             >
               Cerrar sesión
-              <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+              <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
             </button>
           )}
 
@@ -123,19 +123,19 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
             {!userData ? (
               <Link
                 href="/login"
-                className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#4a1414f7] to-[#56070C] text-white font-semibold rounded-md  transition duration-300 group"
+                className="relative overflow-hidden py-2 w-full bg-linear-to-r from-[#4a1414f7] to-[#56070C] text-white font-semibold rounded-md  transition duration-300 group"
                 onClick={() => setOpen(false)}
               >
                 Iniciar sesión
-                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
               </Link>
             ) : (
               <button
                 onClick={handleLogout}
-                className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#4a1414f7] to-[#56070C] text-white font-semibold rounded-md transition duration-300 group"
+                className="relative overflow-hidden py-2 w-full bg-linear-to-r from-[#4a1414f7] to-[#56070C] text-white font-semibold rounded-md transition duration-300 group"
               >
                 Cerrar sesión
-                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
               </button>
             )}
           </div>
