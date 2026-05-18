@@ -18,6 +18,7 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
   const isAdminRoute = pathname?.startsWith("/admin");
 
   const isAdmin = userData?.user?.role === "ADMIN";
+  const isHost = userData?.user?.role === "HOST";
 
   const links = [
     { href: "/", label: "Inicio" },
@@ -28,11 +29,12 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
     links.push({ href: "/reservar", label: "Reservar" });
     links.push({ href: "/mis-reservas", label: "Mis Reservas" });
     links.push({ href: "/dashboard-user", label: "Usuario" });
-  }
+    }
 
   if (isAdmin) {
     links.push({ href: "/admin", label: "Admin" });
   }
+  if (isHost) links.push({ href: "/host", label: "Panel de Reservas"});
 
   return (
     <>

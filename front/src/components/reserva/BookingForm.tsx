@@ -182,7 +182,7 @@ export default function BookingForm() {
 
   return (
     <Protected>
-      <div className="max-w-xl mx-auto p-8 bg-[#f1dbd098] rounded-[2rem] border border-slate-950 shadow-sm mt-10">
+      <div className="max-w-xl mx-auto p-4 sm:p-8 bg-[#f1dbd098] rounded-4xl border border-slate-950 shadow-sm mt-4 sm:mt-10 w-full">
         <h1 className="mb-8 text-2xl font-bold text-slate-800">
           Configura tu reserva
         </h1>
@@ -194,8 +194,8 @@ export default function BookingForm() {
         <TimeGrid selectedTime={time} onSelect={setTime} />
 
         {/* Barra Inferior */}
-        <div className="flex flex-col gap-4 p-5 mt-10 bg-white border shadow-md border-slate-200 rounded-2xl">
-          <div className="flex items-center justify-between w-full">
+        <div className="flex flex-col gap-4 p-4 sm:p-5 mt-10 bg-white border shadow-md border-slate-200 rounded-2xl">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-4">
             <div className="flex flex-col">
               <span className="text-lg font-bold capitalize text-slate-800">
                 {formatDate(date)} - {time}
@@ -208,19 +208,19 @@ export default function BookingForm() {
             {!showOptions ? (
               <button
                 onClick={validarYContinuar}
-                className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
+                className="relative overflow-hidden py-2 px-6 w-full sm:w-auto bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
               >
                 Continuar
-                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
               </button>
             ) : (
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
                 <button
                   onClick={irAPlatillos}
-                  className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
+                  className="relative overflow-hidden py-2 px-6 w-full bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
                 >
                   Elegir Platillos
-                  <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                  <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
                 </button>
                 <button
                   onClick={reservarDirecto}
