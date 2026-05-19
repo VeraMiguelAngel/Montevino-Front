@@ -37,6 +37,10 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
     links.push({ href: "/admin", label: "Admin" });
   }
   if (isHost) links.push({ href: "/host", label: "Panel de Reservas"});
+  
+  if (userData?.user?.role === "MOZO") {
+  links.push({ href: "/mozo", label: "Panel de Mesas" });
+  }
 
   return (
     <>
