@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Swal from "sweetalert2";
 import Protected from "@/components/Protected";
+import { cancelReservation } from "@/services/reservationsService";
 import {
   getCurrentUserWithReservations,
   IReservation,
@@ -107,11 +108,11 @@ export default function MisReservasPage() {
     const normalized = status?.toUpperCase();
 
     if (normalized?.includes("CONFIRM") || normalized?.includes("SUCCESS"))
-      return "Confirmada";
+      return "CONFIRMADA";
     if (normalized?.includes("PENDING") || normalized?.includes("PEND"))
-      return "Pendiente";
+      return "PENDIENTE";
     if (normalized?.includes("FAILURE") || normalized?.includes("CANCEL"))
-      return "Fallida";
+      return "CANCELADA";
 
     return status || "Sin estado";
   };
@@ -136,6 +137,57 @@ export default function MisReservasPage() {
       0,
     );
   };
+
+  const handleCancel = async (reservaId: string, reservationDate: string, startTime: string) => {
+  const reservationDateTime = new Date(`${reservationDate}T${startTime}`);
+  const now = new Date();
+  const diffHours = (reservationDateTime.getTime() - now.getTime()) / (1000 * 60 * 60);
+
+  if (diffHours < 24) {
+    Swal.fire({
+      icon: "error",
+      title: "No podés cancelar",
+      text: "Solo podés cancelar con más de 24hs de anticipación",
+      confirmButtonColor: "#7c090c",
+    });
+    return;
+  }
+
+  const result = await Swal.fire({
+    title: "¿Cancelar reserva?",
+    text: "Esta acción no se puede deshacer",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#7c090c",
+    cancelButtonColor: "#6b7280",
+    confirmButtonText: "Sí, cancelar",
+    cancelButtonText: "Volver",
+  });
+
+  if (!result.isConfirmed) return;
+
+  try {
+    await cancelReservation(reservaId);
+    Swal.fire({
+      icon: "success",
+      title: "Reserva cancelada",
+      timer: 1500,
+      showConfirmButton: false,
+    });
+    setReservas((prev) =>
+      prev.map((r) =>
+        r.id === reservaId ? { ...r, status: "CANCELADA" } : r
+      )
+    );
+  } catch (error: any) {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: error.message,
+      confirmButtonColor: "#7c090c",
+    });
+  }
+};
 
   return (
     <Protected>
@@ -269,6 +321,14 @@ export default function MisReservasPage() {
                       Ver detalle
                       <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
                     </Link>
+                    {String(reserva.status).toUpperCase().includes("CONFIRM") && (
+                      <button
+                        onClick={() => handleCancel(reserva.id, reserva.reservationDate, reserva.startTime)}
+                        className="flex items-center justify-center relative overflow-hidden py-2 w-full bg-white border border-[#7c090c] text-[#7c090c]                    font-semibold rounded-md shadow transition duration-300 cursor-pointer hover:bg-[#fdf2f2]"
+                      >
+                        Cancelar
+                      </button>
+                    )}
 
                     {String(reserva.status).toUpperCase().includes("PEND") && (
                       <Link

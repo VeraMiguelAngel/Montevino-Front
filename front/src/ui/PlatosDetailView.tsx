@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
+ 
 
 interface Props {
   plato: IProduct;
@@ -13,6 +14,9 @@ interface Props {
 const PlatosDetailView = ({ plato }: Props) => {
   const { userData } = useContext(AuthContext);
   const router = useRouter();
+  
+  const isAdmin = userData?.user?.role === "ADMIN";
+  const isHost = userData?.user?.role === "HOST";
 
   const handleReserva = async () => {
   if (!userData) {
@@ -96,12 +100,15 @@ const PlatosDetailView = ({ plato }: Props) => {
               </button>
             </Link>
 
-            <button
-              onClick={handleReserva}
-              className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
-            ><span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
-              Reservar
-            </button>
+            {!isAdmin && !isHost && (
+              <button
+                onClick={handleReserva}
+                className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md            shadow-lg transition duration-300 group cursor-pointer"
+              >
+                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40             to-transparent group-hover:translate-x-full duration-1500"></span>
+                Reservar
+              </button>
+            )}
 
           </div>
 

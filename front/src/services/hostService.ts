@@ -108,5 +108,42 @@ export const getActiveOrders = async () => {
   return res.json();
 };
 
+export const getClosedOrders = async () => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/orders/closed`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al traer las órdenes cerradas");
+  return res.json();
+};
+
+export const getPendingReservations = async () => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/reservations/pending`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al traer las reservas pendientes");
+  return res.json();
+};
+
+export const cancelReservation = async (reservationId: string) => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/reservations/${reservationId}/cancel`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al cancelar la reserva");
+  return res.json();
+};
+
 
 

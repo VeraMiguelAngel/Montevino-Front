@@ -385,6 +385,27 @@ export default function PagoPage() {
                 ? "Procesando..."
                 : `Pagar seña $${formatPrice(señaTotal)}`}
             </button>
+            {/* Avisos importantes */}
+                <div className="rounded-2xl border border-[#e5cfc5] bg-[#fff8f5] p-5 space-y-3 mt-6">
+                  <h3 className="font-serif text-lg text-[#6d1e1e] font-semibold">
+                    ⚠️ Información importante
+                  </h3>
+                  <ul className="space-y-2 text-sm text-[#5c2c2c]">
+                    <li className="flex gap-2">
+                      <span>⏰</span>
+                                      <span>Podés llegar hasta <strong>15 minutos antes</strong> de tu reserva. Tenemos una tolerancia de <strong>30 minutos de retraso</strong>, pasado ese tiempo la mesa puede ser reasignada.</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span>💸</span>
+                      <span>La seña <strong>no es reembolsable</strong> en caso de cancelación con menos de 24hs de anticipación o si no se presenta al turno reservado.</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <span>📅</span>
+                      <span>Podés cancelar tu reserva <strong>hasta 24hs antes</strong> desde la sección &quot;Mis Reservas&quot;.</span>
+                    </li>
+                  </ul>
+                </div>
+
           </div>
 
           <div className="rounded-3xl border border-[#e5cfc5] bg-[#fffaf7] p-6 shadow-sm md:p-8">
@@ -542,7 +563,7 @@ export default function PagoPage() {
                 <p className="text-[#5c2c2c]">Resto en el restaurante</p>
                 <p className="text-[#4f2b2b]">
                   ${formatPrice(restoRestaurante)}
-                </p>
+                </p>                
               </div>
             </div>
           </div>

@@ -120,18 +120,18 @@ export default function HostOrdenPage() {
   icon: "success",
   title: "Mesa cerrada",
   html: `
-        <div class="text-left mt-2">
-          <p><strong>Total platillos:</strong> $${Number(data.totalPedidos).toFixed(2)}</p>
-          <p><strong>Seña ya pagada:</strong> -$${Number(data.depositAmount).toFixed(2)}</p>
-          <hr class="my-2"/>
-          <p class="text-lg"><strong>Total a cobrar:</strong> $${Number(data.totalRestante).toFixed(2)}</p>
-        </div>
-        `,
+          <div class="text-left mt-2">
+            <p><strong>Seña ya pagada:</strong> $${Number(data.depositAmount).toFixed(2)}</p>
+            <p><strong>85% restante de platos:</strong> $${Number(data.restantePrePedidos).toFixed(2)}</p>
+            <p><strong>Extras:</strong> $${Number(data.totalExtras).toFixed(2)}</p>
+            <hr class="my-2"/>
+            <p class="text-lg"><strong>Total a cobrar:</strong> $${Number(data.totalACobrar).toFixed(2)}</p>
+          </div>
+        `     ,
   confirmButtonColor: "#56070C",
   confirmButtonText: "Aceptar",
   });
-      
-  router.push("/host/reservas");
+      router.push("/host/reservas");
     } catch {
       Swal.fire({
         icon: "error",

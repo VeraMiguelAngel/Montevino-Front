@@ -26,10 +26,12 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
   ];
 
   if (userData) {
+  if (!isAdmin && !isHost) {
     links.push({ href: "/reservar", label: "Reservar" });
     links.push({ href: "/mis-reservas", label: "Mis Reservas" });
-    links.push({ href: "/dashboard-user", label: "Usuario" });
     }
+    links.push({ href: "/dashboard-user", label: "Usuario" });
+  }
 
   if (isAdmin) {
     links.push({ href: "/admin", label: "Admin" });

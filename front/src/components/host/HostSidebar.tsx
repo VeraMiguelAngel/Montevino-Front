@@ -4,7 +4,9 @@ import Link from "next/link";
 const hostLinks = [
   { href: "/host", label: "Dashboard" },
   { href: "/host/reservas", label: "Reservas" },
+  { href: "/host/reservas/pendientes", label: "Reservas pendientes" },
   { href: "/host/ordenes", label: "Órdenes en curso" },
+  { href: "/host/ordenes/cerradas", label: "Mesas cerradas" },
 ];
 
 const HostSidebar = ({

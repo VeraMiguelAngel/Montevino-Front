@@ -119,3 +119,24 @@ export const getTablesAvailability = async (fecha: string, hora: string) => {
   }
 };
 
+export const cancelReservation = async (reservationId: string) => {
+  const session = JSON.parse(localStorage.getItem("userSession") ?? "null");
+  const token = session?.token;
+  if (!token) throw new Error("No hay token de autenticación");
+
+  const res = await fetch(`${BACKURL}/reservations/${reservationId}/cancel`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const data = await res.json();
+    throw new Error(data.message || "Error al cancelar la reserva");
+  }
+
+  return res.json();
+};
+
