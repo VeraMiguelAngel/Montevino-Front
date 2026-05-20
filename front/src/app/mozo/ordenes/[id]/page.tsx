@@ -6,7 +6,10 @@ import MozoSidebar from "@/components/mozo/MozoSidebar";
 import { useAuth } from "@/context/AuthContext";
 import { getOrder, deliverPedido, addPedido, closeOrder } from "@/services/mozoService";
 import { getPlatos } from "@/services/platosService";
-import { FiUser, FiUsers, FiClock, FiCheckCircle, FiCircle, FiPlus, FiX } from "react-icons/fi";
+import {
+  FiUser, FiUsers, FiClock, FiCheckCircle,
+  FiCircle, FiPlus, FiX, FiCoffee
+} from "react-icons/fi";
 import Swal from "sweetalert2";
 
 export default function MozoOrdenPage() {
@@ -31,6 +34,7 @@ export default function MozoOrdenPage() {
     }
     fetchOrder();
     fetchPlatos();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthReady, userData]);
 
   const fetchOrder = async () => {
@@ -51,6 +55,18 @@ export default function MozoOrdenPage() {
     } catch {
       console.error("Error al cargar platos");
     }
+  };
+
+  const getStatusIcon = (status: string) => {
+    if (status === "ENTREGADO") return <FiCheckCircle className="text-green-500" size={20} />;
+    if (status === "EN_PREPARACION") return <FiCoffee className="text-orange-400" size={20} />;
+    return <FiCircle className="text-gray-400" size={20} />;
+  };
+
+  const getStatusColor = (status: string) => {
+    if (status === "ENTREGADO") return "bg-green-50 border-green-200";
+    if (status === "EN_PREPARACION") return "bg-orange-50 border-orange-200";
+    return "bg-gray-50 border-gray-200";
   };
 
   const handleDeliver = async (pedidoId: string) => {
@@ -99,49 +115,62 @@ export default function MozoOrdenPage() {
   };
 
   const handleCloseOrder = async () => {
-    const result = await Swal.fire({
-      title: "¿Cerrar la mesa?",
-      text: "Se calculará el total a cobrar",
-      icon: "question",
-      showCancelButton: true,
+  // Verificar que todos los pedidos estén entregados
+  const sinEntregar = pedidos.filter((p: any) => p.status !== "ENTREGADO");
+  
+  if (sinEntregar.length > 0) {
+    Swal.fire({
+      icon: "warning",
+      title: "Pedidos pendientes",
+      text: `Hay ${sinEntregar.length} pedido/s sin entregar. Debés entregar todos antes de cerrar la mesa.`,
       confirmButtonColor: "#56070C",
-      cancelButtonColor: "#6b7280",
-      confirmButtonText: "Sí, cerrar",
-      cancelButtonText: "Cancelar",
     });
+    return;
+  }
 
-    if (!result.isConfirmed) return;
+  const result = await Swal.fire({
+    title: "¿Cerrar la mesa?",
+    text: "Se calculará el total a cobrar",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#56070C",
+    cancelButtonColor: "#6b7280",
+    confirmButtonText: "Sí, cerrar",
+    cancelButtonText: "Cancelar",
+  });
 
-    try {
-      setClosing(true);
-      const data = await closeOrder(id as string);
-      await Swal.fire({
-        icon: "success",
-        title: "Mesa cerrada",
-        html: `
-          <div class="text-left mt-2">
-            <p><strong>Seña ya pagada:</strong> $${Number(data.depositAmount).toFixed(2)}</p>
-            <p><strong>85% restante de platos:</strong> $${Number(data.restantePrePedidos).toFixed(2)}</p>
-            <p><strong>Extras:</strong> $${Number(data.totalExtras).toFixed(2)}</p>
-            <hr class="my-2"/>
-            <p class="text-lg"><strong>Total a cobrar:</strong> $${Number(data.totalACobrar).toFixed(2)}</p>
-          </div>
-        `,
-        confirmButtonColor: "#56070C",
-        confirmButtonText: "Aceptar",
-      });
-      router.push("/mozo/ordenes");
-    } catch {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo cerrar la orden",
-        confirmButtonColor: "#56070C",
-      });
-    } finally {
-      setClosing(false);
-    }
-  };
+  if (!result.isConfirmed) return;
+
+  try {
+    setClosing(true);
+    const data = await closeOrder(id as string);
+    await Swal.fire({
+      icon: "success",
+      title: "Mesa cerrada",
+      html: `
+        <div class="text-left mt-2">
+          <p><strong>Seña ya pagada:</strong> $${Number(data.depositAmount).toFixed(2)}</p>
+          <p><strong>85% restante de platos:</strong> $${Number(data.restantePrePedidos).toFixed(2)}</p>
+          <p><strong>Extras:</strong> $${Number(data.totalExtras).toFixed(2)}</p>
+          <hr class="my-2"/>
+          <p class="text-lg"><strong>Total a cobrar:</strong> $${Number(data.totalACobrar).toFixed(2)}</p>
+        </div>
+      `,
+      confirmButtonColor: "#56070C",
+      confirmButtonText: "Aceptar",
+    });
+    router.push("/mozo/ordenes");
+  } catch {
+    Swal.fire({
+      icon: "error",
+      title: "Error",
+      text: "No se pudo cerrar la orden",
+      confirmButtonColor: "#56070C",
+    });
+  } finally {
+    setClosing(false);
+  }
+};
 
   if (!isAuthReady || !userData) return null;
 
@@ -237,18 +266,10 @@ export default function MozoOrdenPage() {
                     {pedidos.map((p: any) => (
                       <li
                         key={p.id}
-                        className={`flex items-center justify-between p-4 rounded-xl border ${
-                          p.status === "ENTREGADO"
-                            ? "bg-green-50 border-green-200"
-                            : "bg-gray-50 border-gray-200"
-                        }`}
+                        className={`flex items-center justify-between p-4 rounded-xl border ${getStatusColor(p.status)}`}
                       >
                         <div className="flex items-center gap-3">
-                          {p.status === "ENTREGADO" ? (
-                            <FiCheckCircle className="text-green-500" size={20} />
-                          ) : (
-                            <FiCircle className="text-gray-400" size={20} />
-                          )}
+                          {getStatusIcon(p.status)}
                           <div>
                             <p className="font-medium text-gray-800">
                               {p.menuItem?.name}
@@ -259,14 +280,16 @@ export default function MozoOrdenPage() {
                             <p className="text-sm text-gray-400">x{p.quantity}</p>
                           </div>
                         </div>
-                        {p.status !== "ENTREGADO" && (
-                          <button
-                            onClick={() => handleDeliver(p.id)}
-                            className="text-sm py-1 px-3 bg-linear-to-r from-[#7c090c] to-[#520509] text-white rounded-lg hover:opacity-90 transition cursor-pointer"
-                          >
-                            Entregar
-                          </button>
-                        )}
+                        <div className="flex items-center gap-2">
+                          {p.status === "EN_PREPARACION" && (
+                            <button
+                              onClick={() => handleDeliver(p.id)}
+                              className="text-sm py-1 px-3 bg-linear-to-r from-[#7c090c] to-[#520509] text-white rounded-lg hover:opacity-90 transition cursor-pointer"
+                            >
+                              Entregar
+                            </button>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>

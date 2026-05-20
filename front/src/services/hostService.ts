@@ -145,5 +145,18 @@ export const cancelReservation = async (reservationId: string) => {
   return res.json();
 };
 
+export const activarPedidos = async (hostOrderId: string) => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/orders/${hostOrderId}/activate`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al activar los pedidos");
+  return res.json();
+};
+
 
 

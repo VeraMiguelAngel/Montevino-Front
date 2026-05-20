@@ -19,6 +19,7 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
 
   const isAdmin = userData?.user?.role === "ADMIN";
   const isHost = userData?.user?.role === "HOST";
+  const isMozo = userData?.user?.role === "MOZO";
 
   const links = [
     { href: "/", label: "Inicio" },
@@ -26,20 +27,25 @@ export default function Navbar({ sidebarOpen, setSidebarOpen }: NavbarProps) {
   ];
 
   if (userData) {
-  if (!isAdmin && !isHost) {
+  if (!isAdmin && !isHost && !isMozo) {
     links.push({ href: "/reservar", label: "Reservar" });
     links.push({ href: "/mis-reservas", label: "Mis Reservas" });
+    links.push({ href: "/dashboard-user", label: `Usuario: ${userData.user.name}`});
     }
-    links.push({ href: "/dashboard-user", label: "Usuario" });
   }
 
   if (isAdmin) {
     links.push({ href: "/admin", label: "Admin" });
+    links.push({ href: "/dashboard-user", label: "Usuario: Administrador" });
   }
-  if (isHost) links.push({ href: "/host", label: "Panel de Reservas"});
-  
+  if (isHost) {
+    links.push({ href: "/host", label: "Panel de Reservas"});
+    links.push({ href: "/dashboard-user", label: " Usuario: Recepcionista" }); 
+  }
+    
   if (userData?.user?.role === "MOZO") {
   links.push({ href: "/mozo", label: "Panel de Mesas" });
+  links.push({ href: "/dashboard-user", label: "Usuario: Mozo" });
   }
 
   return (
