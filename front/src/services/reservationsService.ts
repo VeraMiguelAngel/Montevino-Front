@@ -140,3 +140,45 @@ export const cancelReservation = async (reservationId: string) => {
   return res.json();
 };
 
+export const getTablesStatus = async () => {
+  const session = JSON.parse(localStorage.getItem("userSession") ?? "null");
+  const token = session?.token;
+  if (!token) {
+    throw new Error("No hay token de autenticación");
+  }
+  try {
+    const res = await fetch(`${BACKURL}/tables/status`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Error al traer el estado de las mesas");
+    }
+
+    return await res.json();
+  } catch (error: any) {
+    console.log(error);
+    throw new Error(error);
+  }
+};
+
+export const getPlatosStats = async () => {
+  const session = JSON.parse(localStorage.getItem("userSession") ?? "null");
+  const token = session?.token;
+  if (!token) throw new Error("No hay token de autenticación");
+
+  const res = await fetch(`${BACKURL}/reservations/stats/platos`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) throw new Error("Error al traer estadísticas de platos");
+  return res.json();
+};
+

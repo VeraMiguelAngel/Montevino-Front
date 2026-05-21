@@ -13,6 +13,7 @@ import {
   FiTrendingUp,
 } from "react-icons/fi";
 import Link from "next/link";
+import TablasMapa from "@/components/admin/TablasMapa";
 
 const AdminView = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -139,6 +140,8 @@ const AdminView = () => {
               </Link>
             ))}
           </div>
+          {/* Mapa de mesas */}
+            <TablasMapa />
 
           {/* Accesos rápidos */}
           <div className="bg-white rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.10)] p-6">

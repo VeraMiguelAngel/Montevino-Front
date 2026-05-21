@@ -8,6 +8,8 @@ import {
   getUsers,
   getUsersById,
   activateUser,
+  makeHost,
+  makeWaiter,
 } from "@/services/usersService";
 import { IUser } from "@/types/types";
 import { useEffect, useState } from "react";
@@ -47,12 +49,34 @@ const UsuariosView = () => {
     setLoadingDetalle(true);
     try {
       const data = await getUsersById(id);
-      console.log("USUARIO DETALLE:", data);
       setUsuarioDetalle(data);
     } catch (error) {
       console.error(error);
     } finally {
       setLoadingDetalle(false);
+    }
+  };
+
+  const handleChangeRole = async (userId: string, nuevoRol: string) => {
+    let response;
+    if (nuevoRol === "ADMIN") response = await promoteUserRole(userId);
+    else if (nuevoRol === "HOST") response = await makeHost(userId);
+    else if (nuevoRol === "MOZO") response = await makeWaiter(userId);
+    else return;
+
+    if (response) {
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === userId ? { ...user, role: nuevoRol } : user
+        )
+      );
+      Swal.fire({
+        title: "Rol actualizado",
+        text: `El usuario ahora es ${nuevoRol}`,
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "#000",
+      });
     }
   };
 
@@ -76,8 +100,8 @@ const UsuariosView = () => {
                     <th className="w-1/5 px-3 py-3 text-center">Nombre</th>
                     <th className="w-1/5 px-3 py-3 text-center">Correo</th>
                     <th className="w-1/5 px-3 py-3 text-center">Rol</th>
-                    <th className="w-1/5 px-3 py-3 text-center">Promover</th>
-                    <th className="w-1/5 px-3 py-3 text-center">Eliminar</th>
+                    <th className="w-1/5 px-3 py-3 text-center">Cambiar Rol</th>
+                    <th className="w-1/5 px-3 py-3 text-center">Deshabilitar</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y">
@@ -94,7 +118,7 @@ const UsuariosView = () => {
                         <tr
                           key={i}
                           className="cursor-pointer hover:bg-gray-50"
-                          onClick={() => handleVerDetalle(u.id)} // <-- Abre el modal
+                          onClick={() => handleVerDetalle(u.id)}
                         >
                           <td className="w-1/5 px-3 py-3 text-center truncate">
                             {u.name}
@@ -107,41 +131,24 @@ const UsuariosView = () => {
                           </td>
                           <td
                             className="w-1/5 px-3 py-3 text-center"
-                            onClick={(e) => e.stopPropagation()} // <-- Evita abrir el modal
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {u.role === "USER" ? (
-                              <button
-                                className="relative overflow-hidden py-2 px-3 bg-gradient-to-r from-[#3d0c07] to-[#56070C] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer text-[15px]"
-                                onClick={async () => {
-                                  const response = await promoteUserRole(u.id);
-                                  if (response) {
-                                    setUsers((prevUsers) =>
-                                      prevUsers.map((user) =>
-                                        user.id === u.id
-                                          ? { ...user, role: "ADMIN" }
-                                          : user,
-                                      ),
-                                    );
-                                    Swal.fire({
-                                      title: "Usuario promovido",
-                                      text: "El usuario ha sido promovido a administrador",
-                                      icon: "success",
-                                      confirmButtonText: "Aceptar",
-                                      confirmButtonColor: "#000",
-                                    });
-                                  }
-                                }}
-                              >
-                                HACER ADMIN
-                                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
-                              </button>
-                            ) : (
-                              <span className="text-sm text-gray-400">—</span>
-                            )}
+                            <select
+                              value={u.role}
+                              onChange={async (e) =>
+                                handleChangeRole(u.id, e.target.value)
+                              }
+                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#56070C]"
+                            >
+                              <option value="USER">USER</option>
+                              <option value="HOST">HOST</option>
+                              <option value="MOZO">MOZO</option>
+                              <option value="ADMIN">ADMIN</option>
+                            </select>
                           </td>
                           <td
                             className="w-1/5 px-3 py-3 text-center"
-                            onClick={(e) => e.stopPropagation()} // <-- Evita abrir el modal
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <button
                               className="relative overflow-hidden py-2 px-3 bg-gradient-to-r from-[#3d0c07] to-[#56070C] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer text-[15px]"
@@ -152,12 +159,12 @@ const UsuariosView = () => {
                                     prevUsers.map((user) =>
                                       user.id === u.id
                                         ? { ...user, isActive: false }
-                                        : user,
-                                    ),
+                                        : user
+                                    )
                                   );
                                   Swal.fire({
-                                    title: "Usuario desahabilitado",
-                                    text: "El usuario ha sido desahabilitado correctamente",
+                                    title: "Usuario deshabilitado",
+                                    text: "El usuario ha sido deshabilitado correctamente",
                                     icon: "success",
                                     confirmButtonText: "Aceptar",
                                     confirmButtonColor: "#000",
@@ -188,7 +195,7 @@ const UsuariosView = () => {
                     <th className="w-1/5 px-3 py-3 text-center">Nombre</th>
                     <th className="w-1/5 px-3 py-3 text-center">Correo</th>
                     <th className="w-1/5 px-3 py-3 text-center">Rol</th>
-                    <th className="w-1/5 px-3 py-3 text-center">Promover</th>
+                    <th className="w-1/5 px-3 py-3 text-center">Rol</th>
                     <th className="w-1/5 px-3 py-3 text-center">Activar</th>
                   </tr>
                 </thead>
@@ -206,7 +213,7 @@ const UsuariosView = () => {
                         <tr
                           key={i}
                           className="cursor-pointer hover:bg-gray-50"
-                          onClick={() => handleVerDetalle(u.id)} // <-- Abre el modal
+                          onClick={() => handleVerDetalle(u.id)}
                         >
                           <td className="w-1/5 px-3 py-3 text-center truncate">
                             {u.name}
@@ -219,13 +226,13 @@ const UsuariosView = () => {
                           </td>
                           <td
                             className="w-1/5 px-3 py-3 text-center"
-                            onClick={(e) => e.stopPropagation()} // <-- Evita abrir el modal
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <span className="text-sm text-gray-400">—</span>
                           </td>
                           <td
                             className="w-1/5 px-3 py-3 text-center"
-                            onClick={(e) => e.stopPropagation()} // <-- Evita abrir el modal
+                            onClick={(e) => e.stopPropagation()}
                           >
                             <button
                               className="relative overflow-hidden py-2 px-3 bg-gradient-to-r from-[#3d0c07] to-[#56070C] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer text-[15px]"
@@ -236,8 +243,8 @@ const UsuariosView = () => {
                                     prevUsers.map((user) =>
                                       user.id === u.id
                                         ? { ...user, isActive: true }
-                                        : user,
-                                    ),
+                                        : user
+                                    )
                                   );
                                   Swal.fire({
                                     title: "Usuario activado",
@@ -289,7 +296,6 @@ const UsuariosView = () => {
                   </button>
                 </div>
 
-                {/* Info del usuario */}
                 <div className="p-4 mb-5 transition-colors border border-gray-200 rounded-xl hover:bg-gray-50">
                   <div>
                     <span className="font-semibold">Nombre:</span>{" "}
@@ -313,7 +319,6 @@ const UsuariosView = () => {
                   </div>
                 </div>
 
-                {/* Reservas del usuario */}
                 <h3 className="mb-4 text-xl font-semibold text-red-950">
                   Reservas ({usuarioDetalle.reservations?.length ?? 0})
                 </h3>
