@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/NavBar";
 import HostSidebar from "@/components/host/HostSidebar";
 import { useAuth } from "@/context/AuthContext";
-import { getTodayReservations, checkIn } from "@/services/hostService";
+import { getReservationsByDate, checkIn } from "@/services/hostService";
 import { FiUser, FiUsers, FiClock, FiCheckCircle } from "react-icons/fi";
 import Swal from "sweetalert2";
 
@@ -41,8 +41,11 @@ interface Reservation {
 
 export default function HostReservasPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [reservations, setReservations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const { userData, isAuthReady } = useAuth();
   const router = useRouter();
 
@@ -52,13 +55,14 @@ export default function HostReservasPage() {
       router.push("/");
       return;
     }
-    fetchReservations();
+    fetchReservations(selectedDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthReady, userData]);
+  }, [isAuthReady, userData, selectedDate]);
 
-  const fetchReservations = async () => {
+  const fetchReservations = async (date: string) => {
+    setLoading(true);
     try {
-      const data = await getTodayReservations();
+      const data = await getReservationsByDate(date);
       setReservations(data);
     } catch (error) {
       console.error(error);
@@ -82,7 +86,7 @@ export default function HostReservasPage() {
 
       if (!result.isConfirmed) return;
 
-      await checkIn(reservationId);
+      const order = await checkIn(reservationId);
 
       await Swal.fire({
         icon: "success",
@@ -92,8 +96,8 @@ export default function HostReservasPage() {
         showConfirmButton: false,
       });
 
-      fetchReservations();
-    } catch (error) {
+      router.push(`/host/ordenes/${order.hostOrderId}`);
+    } catch {
       Swal.fire({
         icon: "error",
         title: "Error",
@@ -112,17 +116,16 @@ export default function HostReservasPage() {
         <HostSidebar open={sidebarOpen} setOpen={setSidebarOpen} />
         <div className="flex-1 px-6 py-10">
           <div className="mb-8">
-            <h1 className="text-4xl font-semibold text-red-950">
-              Reservas de hoy
-            </h1>
-            <p className="mt-2 text-gray-500">
-              {new Date().toLocaleDateString("es-AR", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
+            <h1 className="text-4xl font-semibold text-red-950">Reservas</h1>
+            <div className="mt-4 flex items-center gap-3">
+              <label className="text-gray-600 font-medium">Fecha:</label>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="border border-gray-300 rounded-xl px-4 py-2 text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#56070C]"
+              />
+            </div>
           </div>
 
           {loading ? (
@@ -130,7 +133,7 @@ export default function HostReservasPage() {
           ) : reservations.length === 0 ? (
             <div className="bg-white rounded-2xl p-10 text-center shadow">
               <p className="text-gray-400 text-lg">
-                No hay reservas confirmadas para hoy
+                No hay reservas confirmadas para esta fecha
               </p>
             </div>
           ) : (
@@ -140,7 +143,6 @@ export default function HostReservasPage() {
                   key={r.id}
                   className="bg-white rounded-2xl shadow p-6 flex flex-col gap-4"
                 >
-                  {/* Cliente */}
                   <div className="flex items-center gap-3">
                     <div className="bg-[#F6E3D9] p-2 rounded-xl text-[#56070C]">
                       <FiUser size={20} />
@@ -153,7 +155,6 @@ export default function HostReservasPage() {
                     </div>
                   </div>
 
-                  {/* Info */}
                   <div className="flex gap-4 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
                       <FiClock size={14} /> {r.startTime}
@@ -163,17 +164,15 @@ export default function HostReservasPage() {
                     </span>
                   </div>
 
-                  {/* Mesa */}
                   {r.table && (
                     <p className="text-sm text-gray-500">
                       Mesa:{" "}
                       <span className="font-medium text-gray-700">
-                        #{r.table.number || r.table.id}
+                        #{r.table.tableNumber || r.table.id}
                       </span>
                     </p>
                   )}
 
-                  {/* Pedidos */}
                   {r.pedidos?.length > 0 && (
                     <div>
                       <p className="text-sm font-medium text-gray-700 mb-1">
@@ -190,10 +189,9 @@ export default function HostReservasPage() {
                     </div>
                   )}
 
-                  {/* Botón check-in */}
                   <button
                     onClick={() => handleCheckIn(r.id)}
-                    className="flex items-center justify-center gap-2 mt-2 py-2 px-4 bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-xl shadow hover:opacity-90 transition cursor-pointer"
+                    className="flex items-center justify-center gap-2 mt-2 py-2 px-4 bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-xl shadow hover:opacity-90 transition cursor-pointer"
                   >
                     <FiCheckCircle size={18} />
                     Check-in
