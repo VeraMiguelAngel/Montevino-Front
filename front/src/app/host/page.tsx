@@ -18,6 +18,7 @@ export default function HostPage() {
     if (!userData || userData.user.role !== "HOST") {
       router.push("/");
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthReady, userData]);
 
   if (!isAuthReady || !userData) return null;
@@ -41,7 +42,7 @@ export default function HostPage() {
           {/* Card */}
           <div className="grid grid-cols-1 gap-6 mb-10 sm:grid-cols-2 xl:grid-cols-3">
             <Link href="/host/reservas">
-              <div className="bg-gradient-to-br from-[#350A06] to-[#56070C] text-white rounded-2xl p-6 shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer">
+              <div className="bg-linear-to-br from-[#350A06] to-[#56070C] text-white rounded-2xl p-6 shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-lg font-medium text-white/80">
                     Reservas de hoy
