@@ -242,7 +242,7 @@ export default function MozoOrdenPage() {
                   <p className="text-sm text-gray-500">
                     Mesa:{" "}
                     <span className="font-medium text-gray-700">
-                      #{reservation.table.number || reservation.table.id}
+                      #{reservation.table.tableNumber || reservation.table.id}
                     </span>
                   </p>
                 )}
