@@ -191,7 +191,7 @@ export default function HostReservasPage() {
 
                   <button
                     onClick={() => handleCheckIn(r.id)}
-                    className="flex items-center justify-center gap-2 mt-2 py-2 px-4 bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-xl shadow hover:opacity-90 transition cursor-pointer"
+                    className="flex items-center justify-center gap-2 mt-2 py-2 px-4 bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-xl shadow hover:opacity-90 transition cursor-pointer"
                   >
                     <FiCheckCircle size={18} />
                     Check-in
