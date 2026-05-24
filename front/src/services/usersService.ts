@@ -213,3 +213,18 @@ export async function makeWaiter(id: string) {
   const data = await response.json();
   return data;
 }
+
+export async function makeUser(id: string) {
+  const session = JSON.parse(localStorage.getItem("userSession") ?? "null");
+  const token = session?.token;
+  if (!token) throw new Error("No hay token de autenticación");
+
+  const response = await fetch(`${BACKURL}/users/${id}/makeuser`, {
+    method: "PATCH",
+    headers: {
+      "Content-type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.json();
+}

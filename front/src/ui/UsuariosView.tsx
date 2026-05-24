@@ -10,6 +10,7 @@ import {
   activateUser,
   makeHost,
   makeWaiter,
+  makeUser,
 } from "@/services/usersService";
 import { IUser } from "@/types/types";
 import { useEffect, useState } from "react";
@@ -43,6 +44,7 @@ const UsuariosView = () => {
       }
     };
     init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthReady, userData]);
 
   const handleVerDetalle = async (id: string) => {
@@ -59,7 +61,7 @@ const UsuariosView = () => {
 
   const handleChangeRole = async (userId: string, nuevoRol: string) => {
     let response;
-    if (nuevoRol === "ADMIN") response = await promoteUserRole(userId);
+    if (nuevoRol === "USER") response = await makeUser(userId);
     else if (nuevoRol === "HOST") response = await makeHost(userId);
     else if (nuevoRol === "MOZO") response = await makeWaiter(userId);
     else return;
@@ -133,48 +135,53 @@ const UsuariosView = () => {
                             className="w-1/5 px-3 py-3 text-center"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <select
-                              value={u.role}
-                              onChange={async (e) =>
-                                handleChangeRole(u.id, e.target.value)
-                              }
-                              className="border border-gray-300 rounded-lg px-2 py-1 text-sm text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#56070C]"
-                            >
-                              <option value="USER">USER</option>
-                              <option value="HOST">HOST</option>
-                              <option value="MOZO">MOZO</option>
-                              <option value="ADMIN">ADMIN</option>
-                            </select>
+                            {u.id === userData.user.id ? (
+                              <span className="text-sm text-gray-400">—</span>
+                            ) : (
+                              <select
+                                value={u.role}
+                                onChange={async (e) => handleChangeRole(u.id, e.target.value)}
+                                className="border border-gray-300 rounded-lg px-2 py-1 text-sm text-gray-700 cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#56070C]"
+                              >
+                                <option value="USER">USER</option>
+                                <option value="HOST">HOST</option>
+                                <option value="MOZO">MOZO</option>
+                              </select>
+                            )}
                           </td>
                           <td
                             className="w-1/5 px-3 py-3 text-center"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <button
-                              className="relative overflow-hidden py-2 px-3 bg-gradient-to-r from-[#3d0c07] to-[#56070C] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer text-[15px]"
-                              onClick={async () => {
-                                const response = await desactivateUser(u.id);
-                                if (response) {
-                                  setUsers((prevUsers) =>
-                                    prevUsers.map((user) =>
-                                      user.id === u.id
-                                        ? { ...user, isActive: false }
-                                        : user
-                                    )
-                                  );
-                                  Swal.fire({
-                                    title: "Usuario deshabilitado",
-                                    text: "El usuario ha sido deshabilitado correctamente",
-                                    icon: "success",
-                                    confirmButtonText: "Aceptar",
-                                    confirmButtonColor: "#000",
-                                  });
-                                }
-                              }}
-                            >
-                              DESHABILITAR
-                              <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
-                            </button>
+                            {u.id === userData.user.id ? (
+                              <span className="text-sm text-gray-400">—</span>
+                            ) : (
+                              <button
+                                className="relative overflow-hidden py-2 px-3 bg-gradient-to-r from-[#3d0c07] to-[#56070C] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer text-[15px]"
+                                onClick={async () => {
+                                  const response = await desactivateUser(u.id);
+                                  if (response) {
+                                    setUsers((prevUsers) =>
+                                      prevUsers.map((user) =>
+                                        user.id === u.id
+                                          ? { ...user, isActive: false }
+                                          : user
+                                      )
+                                    );
+                                    Swal.fire({
+                                      title: "Usuario deshabilitado",
+                                      text: "El usuario ha sido deshabilitado correctamente",
+                                      icon: "success",
+                                      confirmButtonText: "Aceptar",
+                                      confirmButtonColor: "#000",
+                                    });
+                                  }
+                                }}
+                              >
+                                DESHABILITAR
+                                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))
