@@ -183,6 +183,12 @@ export default function BookingForm() {
   return (
     <Protected>
       <div className="max-w-xl mx-auto p-4 sm:p-8 bg-[#f1dbd098] rounded-4xl border border-slate-950 shadow-sm mt-4 sm:mt-10 w-full">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-2 mb-4 text-[#7c090c] hover:underline cursor-pointer"
+        >
+          ← Volver
+        </button>
         <h1 className="mb-8 text-2xl font-bold text-slate-800">
           Configura tu reserva
         </h1>
@@ -206,22 +212,38 @@ export default function BookingForm() {
             </div>
 
             {!showOptions ? (
-              <button
-                onClick={validarYContinuar}
-                className="relative overflow-hidden py-2 px-6 w-full sm:w-auto bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
-              >
-                Continuar
-                <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
-              </button>
-            ) : (
-              <div className="flex flex-col gap-2 w-full sm:w-auto">
+              <div className="flex gap-3 w-full sm:w-auto">
                 <button
-                  onClick={irAPlatillos}
-                  className="relative overflow-hidden py-2 px-6 w-full bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
+                  onClick={() => router.back()}
+                  className="relative overflow-hidden py-2 px-6 w-full sm:w-auto border-2 border-[#7c090c] text-[#7c090c] font-semibold rounded-md shadow-lg transition duration-300 cursor-pointer"
                 >
-                  Elegir Platillos
+                  ← Volver
+                </button>
+                <button
+                  onClick={validarYContinuar}
+                  className="relative overflow-hidden py-2 px-6 w-full sm:w-auto bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
+                >
+                  Continuar
                   <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
                 </button>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => router.back()}
+                    className="relative overflow-hidden py-2 px-6 w-full border-2 border-[#7c090c] text-[#7c090c] font-semibold rounded-md shadow-lg transition duration-300 cursor-pointer"
+                  >
+                    ← Volver
+                  </button>
+                  <button
+                    onClick={irAPlatillos}
+                    className="relative overflow-hidden py-2 px-6 w-full bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
+                  >
+                    Elegir Platillos
+                    <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                  </button>
+                </div>
                 <button
                   onClick={reservarDirecto}
                   className="text-[15px] text-black underline text-center cursor-pointer"

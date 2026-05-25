@@ -4,10 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import Protected from "@/components/Protected";
+import { useRouter } from "next/navigation";
+import { cancelReservation } from "@/services/reservationsService";
+import Swal from "sweetalert2";
 
 export default function ReservaDetallePage() {
   const params = useParams();
   const id = params?.id as string;
+
+  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [reserva, setReserva] = useState<any>(null);
@@ -216,22 +221,63 @@ export default function ReservaDetallePage() {
             </div>
 
             <div className="flex flex-col gap-3 mt-8 sm:flex-row">
-              <Link
-                href="/mis-reservas"
-                className="rounded-2xl border border-[#ead8cf] px-5 py-3 text-center font-medium text-[#6d1e1e]"
-              >
-                Volver
-              </Link>
+  <Link
+    href="/mis-reservas"
+    className="rounded-2xl border border-[#ead8cf] px-5 py-3 text-center font-medium text-[#6d1e1e]"
+  >
+    Volver
+  </Link>
 
-              {String(reserva.status).toUpperCase().includes("PEND") && (
-                <Link
-                  href={`/pagos?reservationId=${reserva.id}`}
-                  className="rounded-2xl bg-[#7c090c] px-5 py-3 text-center font-medium text-white hover:bg-[#5f0709]"
-                >
-                  Pagar ahora
-                </Link>
-              )}
-            </div>
+  {String(reserva.status).toUpperCase().includes("PEND") && (
+    <Link
+      href={`/pagos?reservationId=${reserva.id}`}
+      className="rounded-2xl bg-[#7c090c] px-5 py-3 text-center font-medium text-white hover:bg-[#5f0709]"
+    >
+      Pagar ahora
+    </Link>
+  )}
+
+  {(String(reserva.status).toUpperCase().includes("CONFIRM") ||
+  String(reserva.status).toUpperCase().includes("PEND")) && (
+    <button
+      onClick={async () => {
+        const result = await Swal.fire({
+          title: "¿Cancelar reserva?",
+          text: "Esta acción no se puede deshacer",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#7c090c",
+          cancelButtonColor: "#6b7280",
+          confirmButtonText: "Sí, cancelar",
+          cancelButtonText: "Volver",
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+          await cancelReservation(reserva.id);
+          Swal.fire({
+            icon: "success",
+            title: "Reserva cancelada",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+          router.push("/mis-reservas");
+        } catch (error: any) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: error.message,
+            confirmButtonColor: "#7c090c",
+          });
+        }
+      }}
+      className="rounded-2xl border-2 border-[#7c090c] px-5 py-3 text-center font-medium text-[#7c090c] hover:bg-[#fdf2f2] transition cursor-pointer"
+    >
+      Cancelar reserva
+    </button>
+  )}
+</div>
           </div>
         </div>
       </section>

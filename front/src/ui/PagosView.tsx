@@ -375,16 +375,24 @@ export default function PagoPage() {
               </button>
             </div>
 
-            <button
-              onClick={handlePagar}
-              disabled={loading}
-              className="mt-6 w-full relative overflow-hidden  rounded-2xl bg-gradient-to-r from-[#7c090c] to-[#520509] py-3 text-xl font-semibold text-white shadow-lg transition duration-300 group cursor-pointer"
-            >
-              <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
-              {loading
-                ? "Procesando..."
-                : `Pagar seña $${formatPrice(señaTotal)}`}
-            </button>
+            <div className="flex gap-4 mt-6">
+              <button
+                onClick={() => router.back()}
+                className="w-full relative overflow-hidden rounded-2xl border-2 border-[#7c090c] py-3 text-xl font-semibold text-[#7c090c] shadow-lg transition duration-300 group cursor-pointer"
+              >
+                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                ← Volver
+              </button>
+
+              <button
+                onClick={handlePagar}
+                disabled={loading}
+                className="w-full relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#7c090c] to-[#520509] py-3 text-xl font-semibold text-white shadow-lg transition duration-300 group cursor-pointer"
+              >
+                <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                {loading ? "Procesando..." : `Pagar seña $${formatPrice(señaTotal)}`}
+              </button>
+            </div>
             {/* Avisos importantes */}
                 <div className="rounded-2xl border border-[#e5cfc5] bg-[#fff8f5] p-5 space-y-3 mt-6">
                   <h3 className="font-serif text-lg text-[#6d1e1e] font-semibold">

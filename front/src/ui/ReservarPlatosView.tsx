@@ -380,15 +380,20 @@ export default function ReservarPlatosView() {
 
   return (
     <Protected>
-      <div className="mx-auto mt-10 max-w-8xl">
+      <div className="mx-auto mt-6 max-w-8xl">
         <section className="min-h-screen bg-[#f7efea]">
           <div className="bg-[radial-gradient(circle_at_top,#8b0d14_0%,#5d070b_45%,#3d0407_100%)] md:h-45">
             <div className="px-6 mx-auto max-w-7xl py-14 md:px-8 md:py-16">
+              <button
+                onClick={() => router.back()}
+                className="flex items-center gap-2 text-white/80 hover:text-white mb-4 transition "
+              >
+                ← Volver
+              </button>
               <h1 className="font-serif text-white md:text-4xl">
                 Reservar platos y bebidas
               </h1>
-
-              <p className="max-w-3xl mt-3 text-white/90 md:text-xl">
+              <p className="max-w-3xl mt-1 text-white/90 md:text-xl">
                 Elegí tus platos y bebidas para reservarlos antes de tu visita.
               </p>
             </div>
@@ -786,13 +791,21 @@ export default function ReservarPlatosView() {
                     <p>${restoRestaurante}</p>
                   </div>
 
+                  <div className="flex gap-3 mt-6">
                   <button
-                    className="mt-6 relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
+                    onClick={() => router.back()}
+                    className="relative overflow-hidden py-2 px-6 w-auto border-2 border-[#7c090c] text-[#7c090c] font-semibold rounded-md shadow-lg transition duration-300 cursor-pointer whitespace-nowrap"
+                  >
+                    ← Volver
+                  </button>
+                  <button
+                    className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
                     onClick={confirmarReserva}
                   >
                     Confirmar reserva (${señaTotal})
                     <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
                   </button>
+                </div>
                 </div>
               </div>
             </div>
