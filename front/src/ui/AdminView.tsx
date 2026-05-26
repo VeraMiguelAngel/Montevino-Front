@@ -3,7 +3,7 @@ import Sidebar from "@/components/admin/Sidebar";
 import Navbar from "@/components/NavBar";
 import { useAuth } from "@/context/AuthContext";
 import { getPlatos } from "@/services/platosService";
-import { getReservations } from "@/services/reservationsService";
+import { getReservations, getPlatosStats } from "@/services/reservationsService";
 import { getUsers } from "@/services/usersService";
 import { useEffect, useState } from "react";
 import {
@@ -18,6 +18,7 @@ import TablasMapa from "@/components/admin/TablasMapa";
 const AdminView = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { userData, isAuthReady, checkAdmin } = useAuth();
+  const [topPlato, setTopPlato] = useState<{ name: string; total: number } | null>(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalPlatos: 0,
@@ -34,11 +35,16 @@ const AdminView = () => {
       if (userData?.user.role !== "ADMIN") return;
 
       try {
-        const [users, platos, reservas] = await Promise.all([
-          getUsers(),
-          getPlatos(1, 1000),
-          getReservations(),
-        ]);
+        const [users, platos, reservas, platosStats] = await Promise.all([
+  getUsers(),
+  getPlatos(1, 1000),
+  getReservations(),
+  getPlatosStats(),
+]);
+
+if (Array.isArray(platosStats) && platosStats.length > 0) {
+  setTopPlato(platosStats[0]);
+}
 
         const ganancias = Array.isArray(reservas)
           ? reservas.reduce(
@@ -61,6 +67,7 @@ const AdminView = () => {
     };
 
     init();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthReady, userData]);
 
   if (!isAuthReady || !userData) return null;
@@ -74,12 +81,19 @@ const AdminView = () => {
       color: "from-[#350A06] to-[#56070C]",
     },
     {
-      label: "Platos",
-      value: stats.totalPlatos,
+      label: "Plato más pedido",
+      value: topPlato ? `${topPlato.name} (${topPlato.total})` : "Sin datos",
       icon: <FiShoppingBag size={28} />,
-      href: "/admin/platos",
+      href: "/admin/stats",
       color: "from-[#6D4C41] to-[#8D6E63]",
     },
+    // {
+    //   label: "Platos",
+    //   value: stats.totalPlatos,
+    //   icon: <FiShoppingBag size={28} />,
+    //   href: "/admin/platos",
+    //   color: "from-[#6D4C41] to-[#8D6E63]",
+    // },
     {
       label: "Reservas",
       value: stats.totalReservas,
@@ -117,7 +131,7 @@ const AdminView = () => {
             {cards.map((card) => (
               <Link href={card.href} key={card.label}>
                 <div
-                  className={`bg-gradient-to-br ${card.color} text-white rounded-2xl p-6 shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer`}
+                  className={`bg-linear-to-br ${card.color} text-white rounded-2xl p-6 shadow-lg hover:scale-105 transition-transform duration-300 cursor-pointer`}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-lg font-medium text-white/80">
@@ -127,9 +141,9 @@ const AdminView = () => {
                       {card.icon}
                     </div>
                   </div>
-                  <div className="text-4xl font-bold">
+                  <div className="text-2xl font-bold leading-tight line-clamp-2">
                     {loading ? (
-                      <span className="text-2xl animate-pulse">
+                      <span className="text-xl animate-pulse">
                         Cargando...
                       </span>
                     ) : (

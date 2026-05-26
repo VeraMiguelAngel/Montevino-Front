@@ -13,7 +13,6 @@ export default function ReservasAdmin({
   reservas,
   fechaSeleccionada,
   setFechaSeleccionada,
-  fechasUnicas,
 }: ReservasAdminProps) {
   const [reservaDetalle, setReservaDetalle] = useState<IReserva | null>(null);
 
@@ -34,19 +33,13 @@ export default function ReservasAdmin({
         <label htmlFor="fecha" className="mr-2 font-semibold">
           Fecha:
         </label>
-        <select
+        <input
+          type="date"
           id="fecha"
           value={fechaSeleccionada}
           onChange={(e) => setFechaSeleccionada(e.target.value)}
-          className="px-3 py-1 border border-gray-300 rounded-lg"
-        >
-          <option value="Seleccionar fecha">Seleccionar fecha</option>
-          {fechasUnicas.map((fecha) => (
-            <option key={fecha} value={fecha}>
-              {fecha}
-            </option>
-          ))}
-        </select>
+          className="border border-gray-300 rounded-xl px-4 py-2 text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#56070C]"
+        />
       </div>
 
       <table className="w-full table-fixed">

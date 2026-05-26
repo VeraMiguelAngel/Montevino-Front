@@ -9,7 +9,7 @@ import { IReserva } from "@/types/types";
 import { useEffect, useState } from "react";
 
 const ReservasYMesasView = () => {
-  const [fechaSeleccionada, setFechaSeleccionada] = useState("");
+  const [fechaSeleccionada, setFechaSeleccionada] = useState(new Date().toISOString().split("T")[0]);
   const [reservas, setReservas] = useState<IReserva[]>([]);
   const [loading, setLoading] = useState(true);
   const { checkAdmin, isAuthReady, userData } = useAuth();
