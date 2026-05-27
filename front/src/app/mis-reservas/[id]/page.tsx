@@ -93,6 +93,7 @@ export default function ReservaDetallePage() {
                 <p className="mt-1 text-sm text-[#8b7b76]">
                   Reserva #{reserva.id}
                 </p>
+                
               </div>
 
               <span
