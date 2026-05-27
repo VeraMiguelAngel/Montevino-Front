@@ -4,40 +4,12 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/NavBar";
 import HostSidebar from "@/components/host/HostSidebar";
 import { useAuth } from "@/context/AuthContext";
-import { getReservationsByDate, checkIn } from "@/services/hostService";
+import { getReservationsByDate, checkIn, getReservationDates } from "@/services/hostService";
 import { FiUser, FiUsers, FiClock, FiCheckCircle } from "react-icons/fi";
 import Swal from "sweetalert2";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
-interface MenuItem {
-  id: string;
-  name: string;
-}
-
-interface Pedido {
-  id: string;
-  menuItem?: MenuItem;
-  quantity: number;
-}
-
-interface Table {
-  id: string | number;
-  number?: string | number;
-}
-
-interface Reservation {
-  id: string;
-  user?: User;
-  startTime?: string;
-  peopleCount?: number;
-  table?: Table | null;
-  pedidos?: Pedido[];
-}
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { es } from "date-fns/locale";
 
 export default function HostReservasPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -46,6 +18,7 @@ export default function HostReservasPage() {
   const [selectedDate, setSelectedDate] = useState(
     new Date().toISOString().split("T")[0]
   );
+  const [fechasConReservas, setFechasConReservas] = useState<Date[]>([]);
   const { userData, isAuthReady } = useAuth();
   const router = useRouter();
 
@@ -55,9 +28,26 @@ export default function HostReservasPage() {
       router.push("/");
       return;
     }
+    fetchDates();
     fetchReservations(selectedDate);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthReady, userData, selectedDate]);
+  }, [isAuthReady, userData]);
+
+  useEffect(() => {
+    if (selectedDate) fetchReservations(selectedDate);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]);
+
+  const fetchDates = async () => {
+    try {
+      const dates = await getReservationDates();
+      setFechasConReservas(
+        dates.map((d: string) => new Date(`${d}T00:00:00`))
+      );
+    } catch {
+      console.error("Error al cargar fechas");
+    }
+  };
 
   const fetchReservations = async (date: string) => {
     setLoading(true);
@@ -109,6 +99,8 @@ export default function HostReservasPage() {
 
   if (!isAuthReady || !userData) return null;
 
+  const selectedDateObj = new Date(`${selectedDate}T00:00:00`);
+
   return (
     <>
       <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -117,14 +109,44 @@ export default function HostReservasPage() {
         <div className="flex-1 px-6 py-10">
           <div className="mb-8">
             <h1 className="text-4xl font-semibold text-red-950">Reservas</h1>
-            <div className="mt-4 flex items-center gap-3">
-              <label className="text-gray-600 font-medium">Fecha:</label>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="border border-gray-300 rounded-xl px-4 py-2 text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#56070C]"
+
+            <div className="mt-4 bg-white rounded-2xl shadow p-4 inline-block">
+              <DayPicker
+                locale={es}
+                mode="single"
+                selected={selectedDateObj}
+                onSelect={(day) => {
+                  if (day) {
+                    const fecha = day.toISOString().split("T")[0];
+                    setSelectedDate(fecha);
+                  }
+                }}
+                modifiers={{ conReservas: fechasConReservas }}
+                modifiersStyles={{
+                  conReservas: {
+                    fontWeight: "bold",
+                    color: "#56070C",
+                  },
+                }}
+                modifiersClassNames={{
+                  conReservas: "dia-con-reservas",
+                }}
+                styles={{
+                  root: { fontFamily: "inherit" },
+                  caption: { color: "#56070C" },
+                }}
               />
+              <style>{`
+                .dia-con-reservas::after {
+                  content: '';
+                  display: block;
+                  width: 5px;
+                  height: 5px;
+                  background-color: #56070C;
+                  border-radius: 50%;
+                  margin: 0 auto;
+                }
+              `}</style>
             </div>
           </div>
 
@@ -148,9 +170,7 @@ export default function HostReservasPage() {
                       <FiUser size={20} />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-800">
-                        {r.user?.name}
-                      </p>
+                      <p className="font-semibold text-gray-800">{r.user?.name}</p>
                       <p className="text-sm text-gray-400">{r.user?.email}</p>
                     </div>
                   </div>

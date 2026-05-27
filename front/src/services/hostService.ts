@@ -158,5 +158,17 @@ export const activarPedidos = async (hostOrderId: string) => {
   return res.json();
 };
 
+export const getReservationDates = async () => {
+  const token = getToken();
+  const res = await fetch(`${BACKURL}/host/reservations/dates`, {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Error al traer las fechas de reservas");
+  return res.json();
+};
+
 
 
