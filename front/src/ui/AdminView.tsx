@@ -87,7 +87,7 @@ if (Array.isArray(platosStats) && platosStats.length > 0) {
       href: "/admin/stats",
       color: "from-[#6D4C41] to-[#8D6E63]",
     },
-    // {
+    //{
     //   label: "Platos",
     //   value: stats.totalPlatos,
     //   icon: <FiShoppingBag size={28} />,
@@ -163,7 +163,7 @@ if (Array.isArray(platosStats) && platosStats.length > 0) {
               Accesos Rápidos
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Link href="/admin/productos/crear-productos">
+              <Link href="/admin/productos/crear-producto">
                 <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:bg-[#F6E3D9] transition-colors cursor-pointer">
                   <div className="bg-[#F6E3D9] p-3 rounded-xl text-[#56070C]">
                     <FiShoppingBag size={22} />
