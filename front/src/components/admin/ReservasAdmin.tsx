@@ -1,6 +1,9 @@
 "use client";
 import { IReserva } from "@/types/types";
 import { useState } from "react";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { es } from "date-fns/locale";
 
 type ReservasAdminProps = {
   reservas: IReserva[];
@@ -21,6 +24,15 @@ export default function ReservasAdmin({
     if (estado === "pago pendiente") return "bg-orange-100 text-orange-700";
   };
 
+  // Fechas con reservas confirmadas para marcar en el calendario
+  const fechasConReservas = reservas
+    .filter((r) => r.status === "CONFIRMADA")
+    .map((r) => new Date(`${r.reservationDate}T00:00:00`));
+
+  const selectedDate = fechaSeleccionada
+    ? new Date(`${fechaSeleccionada}T00:00:00`)
+    : undefined;
+
   const reservasFiltradas = reservas.filter(
     (r) => r.reservationDate === fechaSeleccionada,
   );
@@ -29,17 +41,44 @@ export default function ReservasAdmin({
     <div className="w-200 h-full p-6 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.20)] bg-white">
       <h2 className="mb-4 text-3xl text-red-950">Reservas</h2>
 
+      {/* Calendario */}
       <div className="mb-6">
-        <label htmlFor="fecha" className="mr-2 font-semibold">
-          Fecha:
-        </label>
-        <input
-          type="date"
-          id="fecha"
-          value={fechaSeleccionada}
-          onChange={(e) => setFechaSeleccionada(e.target.value)}
-          className="border border-gray-300 rounded-xl px-4 py-2 text-gray-700 bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-[#56070C]"
+        <DayPicker
+          locale={es}
+          mode="single"
+          selected={selectedDate}
+          onSelect={(day) => {
+            if (day) {
+              const fecha = day.toISOString().split("T")[0];
+              setFechaSeleccionada(fecha);
+            }
+          }}
+          modifiers={{ conReservas: fechasConReservas }}
+          modifiersStyles={{
+            conReservas: {
+              fontWeight: "bold",
+              color: "#56070C",
+            },
+          }}
+          modifiersClassNames={{
+            conReservas: "dia-con-reservas",
+          }}
+          styles={{
+            root: { fontFamily: "inherit" },
+            caption: { color: "#56070C" },
+          }}
         />
+        <style>{`
+          .dia-con-reservas::after {
+            content: '';
+            display: block;
+            width: 5px;
+            height: 5px;
+            background-color: #56070C;
+            border-radius: 50%;
+            margin: 0 auto;
+          }
+        `}</style>
       </div>
 
       <table className="w-full table-fixed">
@@ -65,7 +104,7 @@ export default function ReservasAdmin({
               <tr
                 key={i}
                 className="cursor-pointer hover:bg-gray-50"
-                onClick={() => setReservaDetalle(r)} // <-- Agrega esto
+                onClick={() => setReservaDetalle(r)}
               >
                 <td className="w-1/6 px-3 py-3 text-center">
                   {r.reservationDate}
@@ -94,6 +133,7 @@ export default function ReservasAdmin({
           )}
         </tbody>
       </table>
+
       {/* Modal de detalle */}
       {reservaDetalle && (
         <div
@@ -114,26 +154,11 @@ export default function ReservasAdmin({
               Detalle de Reserva
             </h3>
             <div className="space-y-2">
-              <div>
-                <span className="font-semibold">Nombre:</span>{" "}
-                {reservaDetalle.user.name}
-              </div>
-              <div>
-                <span className="font-semibold">Email:</span>{" "}
-                {reservaDetalle.user.email}
-              </div>
-              <div>
-                <span className="font-semibold">Fecha:</span>{" "}
-                {reservaDetalle.reservationDate}
-              </div>
-              <div>
-                <span className="font-semibold">Hora:</span>{" "}
-                {reservaDetalle.startTime}
-              </div>
-              <div>
-                <span className="font-semibold">Personas:</span>{" "}
-                {reservaDetalle.peopleCount}
-              </div>
+              <div><span className="font-semibold">Nombre:</span> {reservaDetalle.user.name}</div>
+              <div><span className="font-semibold">Email:</span> {reservaDetalle.user.email}</div>
+              <div><span className="font-semibold">Fecha:</span> {reservaDetalle.reservationDate}</div>
+              <div><span className="font-semibold">Hora:</span> {reservaDetalle.startTime}</div>
+              <div><span className="font-semibold">Personas:</span> {reservaDetalle.peopleCount}</div>
               <div>
                 <span className="font-semibold">Mesa:</span>{" "}
                 {reservaDetalle.table && reservaDetalle.table.tableNumber
@@ -142,18 +167,14 @@ export default function ReservasAdmin({
               </div>
               <div>
                 <span className="font-semibold">Estado:</span>{" "}
-                <span
-                  className={`px-2 py-1 rounded-full text-xs font-medium ${estadoColor(reservaDetalle.status.toLowerCase())}`}
-                >
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${estadoColor(reservaDetalle.status.toLowerCase())}`}>
                   {reservaDetalle.status}
                 </span>
               </div>
-              {/* Platos pedidos */}
               <div>
                 <span className="font-semibold">Platos pedidos:</span>
                 <ul className="mt-1 ml-4 list-disc">
-                  {Array.isArray(reservaDetalle.pedidos) &&
-                  reservaDetalle.pedidos.length > 0 ? (
+                  {Array.isArray(reservaDetalle.pedidos) && reservaDetalle.pedidos.length > 0 ? (
                     reservaDetalle.pedidos.map((pedido: any, idx: number) => (
                       <li key={pedido.id || idx}>
                         {pedido.name} x {pedido.quantity}{" "}
@@ -169,18 +190,12 @@ export default function ReservasAdmin({
               </div>
               <div>
                 <span className="font-semibold">Total:</span>{" "}
-                <span>
-                  $
-                  {Array.isArray(reservaDetalle.pedidos)
-                    ? reservaDetalle.pedidos
-                        .reduce(
-                          (acc: number, pedido: any) =>
-                            acc + pedido.price * pedido.quantity,
-                          0,
-                        )
-                        .toFixed(2)
-                    : "0.00"}
-                </span>
+                $
+                {Array.isArray(reservaDetalle.pedidos)
+                  ? reservaDetalle.pedidos
+                      .reduce((acc: number, pedido: any) => acc + pedido.price * pedido.quantity, 0)
+                      .toFixed(2)
+                  : "0.00"}
               </div>
             </div>
           </div>
