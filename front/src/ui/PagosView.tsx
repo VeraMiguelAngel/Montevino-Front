@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
 import Protected from "@/components/Protected";
 import { useReservation } from "@/context/ReservationContext";
+import { useAuth } from "@/context/AuthContext";
 
 type ProductItem = {
   id: string;
@@ -21,6 +22,18 @@ export default function PagoPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reservationIdFromUrl = searchParams.get("reservationId");
+
+  const { userData, isAuthReady } = useAuth();
+
+useEffect(() => {
+  if (!isAuthReady) return;
+  if (userData?.user?.role === "ADMIN" ||
+      userData?.user?.role === "HOST" ||
+      userData?.user?.role === "MOZO") {
+    router.push("/");
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isAuthReady, userData]);
 
   const { reservationData, clearReservationData } = useReservation();
 

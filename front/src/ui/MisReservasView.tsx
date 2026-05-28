@@ -9,10 +9,25 @@ import {
   getCurrentUserWithReservations,
   IReservation,
 } from "@/services/usersService";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function MisReservasPage() {
   const [reservas, setReservas] = useState<IReservation[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { userData, isAuthReady } = useAuth();
+  const router = useRouter();
+
+useEffect(() => {
+  if (!isAuthReady) return;
+  if (userData?.user?.role === "ADMIN" ||
+      userData?.user?.role === "HOST" ||
+      userData?.user?.role === "MOZO") {
+    router.push("/");
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isAuthReady, userData]);
   useEffect(() => {
     const loadReservas = async () => {
       try {

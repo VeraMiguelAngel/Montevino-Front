@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IProduct } from "@/types/types";
 import Protected from "@/components/Protected";
 import Swal from "sweetalert2";
@@ -9,6 +9,7 @@ import { getPlatos } from "@/services/platosService";
 import { getBebidas } from "@/services/bebidasService";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useReservation } from "@/context/ReservationContext";
+import { useAuth } from "@/context/AuthContext";
 
 type CartItem = IProduct & {
   quantity: number;
@@ -29,13 +30,21 @@ export default function ReservarPlatosView() {
 
   const searchParams = useSearchParams();
 
+  const { userData, isAuthReady } = useAuth();
+
+useEffect(() => {
+  if (!isAuthReady) return;
+  if (userData?.user?.role === "ADMIN" ||
+      userData?.user?.role === "HOST" ||
+      userData?.user?.role === "MOZO") {
+    router.push("/");
+  }
+// eslint-disable-next-line react-hooks/exhaustive-deps
+}, [isAuthReady, userData]);
+
   const reservationDate = searchParams.get("fecha");
   const startTime = searchParams.get("hora") || "";
   const peopleCount = Number(searchParams.get("personas")) || 1;
-
-  console.log("fecha:", reservationDate);
-  console.log("hora:", startTime);
-  console.log("persona:", peopleCount);
 
   useEffect(() => {
     const savedCart = localStorage.getItem("montevino_reserva_cart");
@@ -77,11 +86,7 @@ export default function ReservarPlatosView() {
           ...plato,
           type: "platos",
         }));
-
-        console.log("PRODUCTOS DEL BACK:", [
-          ...platosAdaptados,
-          ...bebidasAdaptadas,
-        ]);
+        
         setProducts([...platosAdaptados, ...bebidasAdaptadas]);
       } catch (error) {
         console.error("Error al traer productos:", error);
@@ -93,11 +98,7 @@ export default function ReservarPlatosView() {
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    console.log("PRODUCTS...", products);
-    [products];
-  });
-
+  
   const platos = useMemo(() => {
     return products.filter((item) => item.type?.toLowerCase() === "platos");
   }, [products]);
@@ -410,7 +411,7 @@ export default function ReservarPlatosView() {
                   }}
                   className={`px-8 py-4 text-xl font-medium transition ${
                     activeTab === "platos"
-                      ? "bg-gradient-to-r from-[#7c090c] to-[#520509] text-white"
+                      ? "bg-linear-to-r from-[#7c090c] to-[#520509] text-white"
                       : "bg-transparent text-[#6b3030]"
                   }`}
                 >
@@ -425,7 +426,7 @@ export default function ReservarPlatosView() {
                   }}
                   className={`px-8 py-4 text-xl font-medium transition ${
                     activeTab === "bebidas"
-                      ? "bg-gradient-to-r from-[#7c090c] to-[#520509] text-white"
+                      ? "bg-linear-to-r from-[#7c090c] to-[#520509] text-white"
                       : "bg-transparent text-[#6b3030]"
                   }`}
                 >
@@ -440,7 +441,7 @@ export default function ReservarPlatosView() {
                     onClick={() => setCategoryFilter(option)}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                       categoryFilter === option
-                        ? "bg-gradient-to-r from-[#7c090c] to-[#520509] text-white"
+                        ? "bg-linear-to-r from-[#7c090c] to-[#520509] text-white"
                         : "border border-[#d8b6ac] bg-[#f1dbd098] text-[#6b3030]"
                     }`}
                   >
@@ -524,7 +525,7 @@ export default function ReservarPlatosView() {
                                   -
                                 </button>
 
-                                <div className="flex h-10 min-w-[56px] items-center justify-center border-x border-[#e5cfc5] px-4 text-lg font-semibold text-[#6d1e1e]">
+                                <div className="flex h-10 min-w-14 items-center justify-center border-x border-[#e5cfc5] px-4 text-lg font-semibold text-[#6d1e1e]">
                                   {quantity}
                                 </div>
 
@@ -541,9 +542,9 @@ export default function ReservarPlatosView() {
                                 <button
                                   onClick={() => agregarAlCarrito(item)}
                                   disabled={sinStock}
-                                  className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="relative overflow-hidden py-2 w-full bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                  <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                                  <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
                                   {sinStock
                                     ? "Sin stock"
                                     : isReserved
@@ -657,7 +658,7 @@ export default function ReservarPlatosView() {
                               fill="none"
                               stroke="currentColor"
                               strokeWidth="2"
-                              className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-[#e20b16] to-[#7e080d] text-white shadow-md hover:brightness-150 transition"
+                              className="w-8 h-8 flex items-center justify-center rounded-full bg-linear-to-r from-[#e20b16] to-[#7e080d] text-white shadow-md hover:brightness-150 transition"
                             >
                               <path
                                 strokeLinecap="round"
@@ -799,11 +800,11 @@ export default function ReservarPlatosView() {
                     ← Volver
                   </button>
                   <button
-                    className="relative overflow-hidden py-2 w-full bg-gradient-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
+                    className="relative overflow-hidden py-2 w-full bg-linear-to-r from-[#7c090c] to-[#520509] text-white font-semibold rounded-md shadow-lg transition duration-300 group cursor-pointer"
                     onClick={confirmarReserva}
                   >
                     Confirmar reserva (${señaTotal})
-                    <span className="absolute inset-0 transition-transform -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
+                    <span className="absolute inset-0 transition-transform -translate-x-full bg-linear-to-r from-transparent via-white/40 to-transparent group-hover:translate-x-full duration-1500"></span>
                   </button>
                 </div>
                 </div>

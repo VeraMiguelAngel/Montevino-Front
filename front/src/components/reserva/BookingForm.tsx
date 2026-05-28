@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import Protected from "@/components/Protected";
@@ -10,6 +10,7 @@ import CalendarCustom from "./CalendarCuston";
 import TimeGrid from "./Time.Grid";
 import Swal from "sweetalert2";
 import { useReservation } from "@/context/ReservationContext";
+import { useAuth } from "@/context/AuthContext";
 
 export default function BookingForm() {
   const [guests, setGuests] = useState(3);
@@ -19,6 +20,17 @@ export default function BookingForm() {
 
   const { setReservationData } = useReservation();
   const router = useRouter();
+
+  const { userData, isAuthReady } = useAuth();
+
+useEffect(() => {
+  if (!isAuthReady) return;
+  if (userData?.user?.role === "ADMIN" || 
+      userData?.user?.role === "HOST" || 
+      userData?.user?.role === "MOZO") {
+    router.push("/");
+  }
+}, [isAuthReady, userData]);
 
   const VALID_TIMES = ["18:00", "20:00", "22:00", "00:00"];
 
